@@ -1,5 +1,9 @@
 resource "aws_secretsmanager_secret_rotation" "rotation" {
-  secret_id           = aws_secretsmanager_secret.db-pass.id
+	# make sure that the initial value is saved before setting up rotation
+	# otherwise, it can result in a
+	# ResourceNotFoundException: An error occurred (ResourceNotFoundException) when calling the GetSecretValue operation:
+	# Secrets Manager can't find the specified secret value for staging label: AWSCURRENT
+  secret_id           = aws_secretsmanager_secret_version.db-pass-val.secret_id
   rotation_lambda_arn = aws_serverlessapplicationrepository_cloudformation_stack.rotate-stack.outputs.RotationLambdaARN
 
   rotation_rules {
